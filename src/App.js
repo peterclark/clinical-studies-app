@@ -1,23 +1,32 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
+  const [studies, setStudies] = useState([]);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const { REACT_APP_API_URL: url, REACT_APP_AUTHORIZATION: authorization } = process.env;
+      const { status, data } = await axios.get(url, { headers: { authorization }});
+      if (status !== 200) throw new Error('Unable to fetch studies');
+      setStudies(data || []);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {
+        studies.map(study => (
+          <p>{study.title}</p>
+        ))
+      }
     </div>
   );
 }
